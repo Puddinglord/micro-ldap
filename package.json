@@ -1,0 +1,20 @@
+{
+    "name": "@puddinglord/micro-ldap",
+    "version": "0.0.2",
+    "description": "A replacement for user and password management without the overhead of a full LDAP.",
+    "license": "MIT",
+    "repository": "Puddinglord/micro-ldap",
+    "main": "index.js",
+    "keywords": [
+        "micro-ldap",
+        "micro",
+        "LDAP",
+        "ldap",
+        "npm",
+        "package",
+        "puddinglord"
+    ],
+    "devDependencies": {
+        "eslint": "^5.15.0"
+    }
+}
