@@ -4,4 +4,12 @@ const name = require("../index");
 
 name.test();
 
-name.config("1");
+let newConfigurationOptions = {
+  existingMongoUsernameCollection: "Users",
+  newMongoRulesetCollection: "UsersExpirationAndRulesets",
+  defaultExpirationTime: 30,
+  useDefaultRuleset: true,
+  defaultServiceInterval: 86400000
+};
+
+name.configureService(newConfigurationOptions);

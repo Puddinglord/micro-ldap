@@ -11,6 +11,14 @@ class MicroLDAP {
   constructor () {
     this.checkTypes = require("../helpers/checkTypes");
 
+    this.configurationOptions = {
+      existingMongoUsernameCollection: null,
+      newMongoRulesetCollection: "UsersExpirationAndRulesets",
+      defaultExpirationTime: 30,
+      useDefaultRuleset: true,
+      defaultServiceInterval: 86400000
+    };
+
     // Configuration variables
     this.existingMongoUsernameCollection = null;
     this.newMongoRulesetCollection = null;
@@ -34,21 +42,20 @@ class MicroLDAP {
     clearInterval(this.timerReference);
   }
 
-  configureService (existingMongoUsernameCollection, newMongoRulesetCollection = "UsersExpirationAndRulesets", defaultExpirationTime = 30,
-    useDefaultRuleset = true, defaultServiceInterval = 86400000) {
+  configureService (newConfigurationOptions) {
     // Check to make sure the parameters passed in are of the correct type
     // If they are not of the correct type then the checkTypes function will throw an error
-    this.checkTypes(existingMongoUsernameCollection, String);
-    this.checkTypes(newMongoRulesetCollection, String);
-    this.checkTypes(defaultExpirationTime, Number);
-    this.checkTypes(useDefaultRuleset, Boolean);
-    this.checkTypes(defaultServiceInterval, Number);
+    this.checkTypes(newConfigurationOptions.existingMongoUsernameCollection, String);
+    this.checkTypes(newConfigurationOptions.newMongoRulesetCollection, String);
+    this.checkTypes(newConfigurationOptions.defaultExpirationTime, Number);
+    this.checkTypes(newConfigurationOptions.useDefaultRuleset, Boolean);
+    this.checkTypes(newConfigurationOptions.defaultServiceInterval, Number);
 
-    this.existingMongoUsernameCollection = existingMongoUsernameCollection;
-    this.newMongoRulesetCollection = newMongoRulesetCollection;
-    this.defaultExpirationTime = defaultExpirationTime;
-    this.useDefaultRuleset = useDefaultRuleset;
-    this.defaultServiceInterval = defaultServiceInterval;
+    this.configurationOptions.existingMongoUsernameCollection = newConfigurationOptions.existingMongoUsernameCollection;
+    this.configurationOptions.newMongoRulesetCollection = newConfigurationOptions.newMongoRulesetCollection;
+    this.configurationOptions.defaultExpirationTime = newConfigurationOptions.defaultExpirationTime;
+    this.configurationOptions.useDefaultRuleset = newConfigurationOptions.useDefaultRuleset;
+    this.configurationOptions.defaultServiceInterval = newConfigurationOptions.defaultServiceInterval;
   }
 
   test () {
