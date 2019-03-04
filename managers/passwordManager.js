@@ -1,16 +1,20 @@
 "use strict";
 
 /**
- *
+ * This class manages all of the password functionallity such as checking the password
+ * to make sure it's following the ruleset and so on.
  *
  * @class PasswordManager
  */
 class PasswordManager {
-  /**
-   * Creates an instance of PasswordManager.
-   * @memberof PasswordManager
-   */
   constructor () {
+    this.defaultRuleset = this.initializeDefaultRuleset();
+    this.currentRuleset = this.initializeCurrentRuleset();
+
+    this.useDefaultRuleset = true;
+  }
+
+  initializeDefaultRuleset () {
     this.defaultRuleset = {
       requireLowercase: true,
       numberOfLowercase: 1,
@@ -23,7 +27,9 @@ class PasswordManager {
       minimumLength: 8,
       maximumLength: 100
     };
+  }
 
+  initializeCurrentRuleset () {
     this.currentRuleset = {
       requireLowercase: null,
       numberOfLowercase: null,
@@ -36,8 +42,6 @@ class PasswordManager {
       minimumLength: null,
       maximumLength: null
     };
-
-    this.useDefaultRuleset = true;
   }
 
   /**
@@ -45,7 +49,8 @@ class PasswordManager {
    * If it's a boolean then we know the user wants to use the default ruleset.
    * If not then we accept a ruleset object and update our current ruleset object
    *
-   * @param {*} newRuleset
+   * @param {Boolean | Object} newRuleset If it's a boolean then we know the user wants to use the default
+   * ruleset. If not then it must be an object which we will take as our new current ruleset.
    * @memberof PasswordManager
    */
   updateRuleset (newRuleset) {
@@ -63,7 +68,8 @@ class PasswordManager {
    * If it does then we simply return true.
    * If not then we return false.
    *
-   * @param {*} passwordToCheck
+   * @param {String} passwordToCheck The plain-text password that needs to be checked to make sure it's
+   * complying with the current ruleset.
    * @memberof PasswordManager
    */
   checkPassword (passwordToCheck) {

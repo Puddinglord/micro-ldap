@@ -8,10 +8,6 @@
  * @class microLDAP
  */
 class MicroLDAP {
-  /**
-   * Creates an instance of MicroLDAP.
-   * @memberof MicroLDAP
-   */
   constructor () {
     this.checkTypes = require("../helpers/checkTypes");
     this.passwordManager = require("../managers/passwordManager");
@@ -36,7 +32,7 @@ class MicroLDAP {
   }
 
   /**
-   *
+   * Starts the Micro LDAP service
    *
    * @memberof MicroLDAP
    */
@@ -58,7 +54,9 @@ class MicroLDAP {
   }
 
   /**
-   *
+   * This lets the user configure the micro LDAP to suit their needs.
+   * It also allows us to access the list of users we will be managing and
+   * set some default timer lengths.
    *
    * @param {*} newConfigurationOptions
    * @memberof MicroLDAP
