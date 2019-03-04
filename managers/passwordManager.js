@@ -14,6 +14,12 @@ class PasswordManager {
     this.useDefaultRuleset = true;
   }
 
+  /**
+   * Initializes the default ruleset so we have some default values to work
+   * with in case the user just wants some basic password complexity
+   *
+   * @memberof PasswordManager
+   */
   initializeDefaultRuleset () {
     this.defaultRuleset = {
       requireLowercase: true,
@@ -29,6 +35,11 @@ class PasswordManager {
     };
   }
 
+  /**
+   * Initializes the current ruleset so we have an object to work with
+   *
+   * @memberof PasswordManager
+   */
   initializeCurrentRuleset () {
     this.currentRuleset = {
       requireLowercase: null,
