@@ -2,8 +2,6 @@
 
 const name = require("../index");
 
-name.test();
-
 let newConfigurationOptions = {
   existingMongoUsernameCollection: "Users",
   newMongoRulesetCollection: "UsersExpirationAndRulesets",
@@ -13,3 +11,5 @@ let newConfigurationOptions = {
 };
 
 name.configureService(newConfigurationOptions);
+
+console.log(name.checkPassword("Mn3!"));

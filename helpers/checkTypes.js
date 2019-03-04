@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function checkType (value, type, i) {
+module.exports = function CheckType (value, type, i) {
   // perform the appropiate test to the passed
   // value according to the provided type
   switch (type) {
