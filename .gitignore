@@ -65,3 +65,6 @@ typings/
 .eslintrc.json
 
 package-lock.json
+
+# custom testing (non unit tests)
+test/
