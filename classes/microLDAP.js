@@ -5,30 +5,31 @@
  * the service as well as a way to ocrcestrate other functionality and features that can extend and enhance the base
  * feature set.
  *
+ * This class also provides passthrough functions that are used to extend functionallity
+ * while keeping the code base clean and tidy.
+ *
  * @class MicroLDAP
  */
 class MicroLDAP {
   constructor () {
     this.checkTypes = require("../helpers/CheckTypes");
     this.passwordManager = require("../managers/PasswordManager");
+    this.databaseManagerMongo = require("../managers/DatabaseManagerMongo");
 
+    // Configuration Object
     this.configurationOptions = {
-      existingMongoUsernameCollection: null,
+      existingMongoUsernameCollection: "Users",
       newMongoRulesetCollection: "UsersExpirationAndRulesets",
       defaultExpirationTime: 30, // Measured in days
       useDefaultRuleset: true,
       defaultServiceInterval: 86400000 // 24 hours in milliseconds
     };
 
-    // Configuration variables
-    this.existingMongoUsernameCollection = null;
-    this.newMongoRulesetCollection = null;
-    this.defaultExpirationTime = null;
-    this.useDefaultRuleset = null;
-    this.defaultServiceInterval = null;
-
     // Timer based variables
     this.timerReference = null;
+
+    // List of usernames
+    this.usernameList = [];
   }
 
   /**
@@ -44,7 +45,7 @@ class MicroLDAP {
   }
 
   /**
-   * Stop the service
+   * Stops the service
    *
    * @memberof MicroLDAP
    */
@@ -89,11 +90,31 @@ class MicroLDAP {
    *
    * @param {String} passwordToCheck The plain-text password to check. This is a passthrough function to PasswordManager
    * which lets the real function be exposed to the user.
-   * @returns Boolean
+   * @returns {Boolean} Returns true if the password meets or exceeds the ruleset, false if not.
    * @memberof MicroLDAP
    */
   checkPassword (passwordToCheck) {
     return this.passwordManager.checkPassword(passwordToCheck);
+  }
+
+  /**
+   * This is a passthrough function to the database manager that handles the mongoDB connection
+   * and operation.
+   *
+   * @param {String} mongoUrl The URL of the mongo database either external or locally hosted.
+   * @param {String} databaseName The name of the database to connect to.
+   * @param {String} collectionName The name of the collection where the users are stored.
+   * @param {String} usernameName The name of the field that relates to the usernames in the collection.
+   * @memberof MicroLDAP
+   */
+  setupDatabaseInformation (mongoUrl, databaseName, collectionName, usernameName) {
+    this.databaseManagerMongo.setupDatabaseInformation(mongoUrl, databaseName, collectionName, usernameName);
+  }
+
+  async findAllUsers () {
+    await this.databaseManagerMongo.findAllUsers().then((result) => {
+      this.usernameList = result;
+    });
   }
 }
 

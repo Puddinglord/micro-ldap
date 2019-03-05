@@ -8,8 +8,8 @@
  */
 class PasswordManager {
   constructor () {
+    this.currentRuleset = null;
     this.defaultRuleset = this.initializeDefaultRuleset();
-    this.currentRuleset = this.initializeCurrentRuleset();
 
     this.useDefaultRuleset = true;
   }
@@ -33,26 +33,8 @@ class PasswordManager {
       minimumLength: 8,
       maximumLength: 100
     };
-  }
 
-  /**
-   * Initializes the current ruleset so we have an object to work with
-   *
-   * @memberof PasswordManager
-   */
-  initializeCurrentRuleset () {
-    this.currentRuleset = {
-      requireLowercase: null,
-      numberOfLowercase: null,
-      requireUppercase: null,
-      numberOfUppercase: null,
-      requireNumber: null,
-      numberOfNumbers: null,
-      requireSpecialCharacter: null,
-      numberOfSpecialCharacters: null,
-      minimumLength: null,
-      maximumLength: null
-    };
+    this.currentRuleset = this.defaultRuleset;
   }
 
   /**

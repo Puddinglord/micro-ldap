@@ -8,7 +8,7 @@
  */
 class DatabaseManagerMongo {
   constructor () {
-    this.mongoClient = null;
+    this.mongoClient = require("mongodb").MongoClient;
     this.mongoUrl = null;
     this.databaseName = null;
     this.collectionName = null;
@@ -17,23 +17,25 @@ class DatabaseManagerMongo {
     this.isDbConnected = false;
   }
 
-  async initializeDatabaseConnection () {
+  initializeDatabaseConnection (callback) {
     if (!this.isDbConnected) {
-      await this.mongoClient.connect(this.mongoUrl, { useNewUrlParser: true }, (err, db) => {
+      this.mongoClient.connect(this.mongoUrl, { useNewUrlParser: true }, (err, db) => {
         if (err) {
           console.error(err);
         } else {
           this.database.db = db;
           this.database.databaseObject = db.db(this.databaseName);
           this.isDbConnected = true;
+          console.log("connected");
+          callback();
         }
       });
     }
   }
 
-  async isDatabaseReadyForQuery () {
+  isDatabaseReadyForQuery () {
     if (!this.isDbConnected) {
-      await this.initializeDatabaseConnection();
+      this.initializeDatabaseConnection();
     } else {
       return this.isDbConnected;
     }
@@ -53,25 +55,38 @@ class DatabaseManagerMongo {
     // eslint-disable-next-line no-unused-vars
     const usernameName = this.usernameName;
 
-    await this.isDatabaseReadyForQuery.then((result) => {
-      if (result) {
-        this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
-          if (error) {
-            console.error(error);
-          }
+    if (this.isDatabaseReadyForQuery()) {
+      await this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
+        if (error) {
+          console.error(error);
+        }
 
-          usernameList.push(document);
-        });
-      }
-    });
+        usernameList.push(document.username);
+      });
 
-    return usernameList;
+      return usernameList;
+    };
+  }
+
+  /**
+   * This functions sets up the required information so we can connect to the correct database
+   * and read the data we need to perform our task. This should only be called once and right
+   * after setting up the microLDAP object.
+   *
+   * @param {String} mongoUrl The URL of the mongo database either external or locally hosted.
+   * @param {String} databaseName The name of the database to connect to.
+   * @param {String} collectionName The name of the collection where the users are stored.
+   * @param {String} usernameName The name of the field that relates to the usernames in the collection.
+   * @memberof DatabaseManagerMongo
+   */
+  setupDatabaseInformation (mongoUrl, databaseName, collectionName, usernameName) {
+    this.mongoUrl = mongoUrl;
+    this.databaseName = databaseName;
+    this.collectionName = collectionName;
+    this.usernameName = usernameName;
   }
 
   // Getters and Setters
-  getMongoClient () { return this.mongoClient; };
-  setMongoClient (mongoClient) { this.mongoClient = mongoClient; };
-
   getMongoUrl () { return this.mongoUrl; };
   setMongoUrl (mongoUrl) { this.mongoUrl = mongoUrl; };
 
