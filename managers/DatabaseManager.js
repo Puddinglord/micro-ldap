@@ -58,13 +58,9 @@ class DatabaseManagerMongo {
         this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
           if (error) {
             console.error(error);
-          } else {
-            if (document === null) {
-              console.error("Null document found");
-            } else {
-              usernameList.push(document);
-            }
           }
+
+          usernameList.push(document);
         });
       }
     });
