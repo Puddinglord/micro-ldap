@@ -12,17 +12,27 @@ let name = require("../index");
 
 // name.configureService();
 
-console.log(name.checkPassword("Aa5%"));
+console.log(name.passwordManager.checkPassword("Aa5%"));
 
-name.setupDatabaseInformation("mongodb://localhost:27017/microLDAP", "microLDAP", "Users", "username");
+name.databaseManagerMongo.setupDatabaseInformation("mongodb://localhost:27017/microLDAP", "microLDAP", "Users", "username");
 
 name.databaseManagerMongo.initializeDatabaseConnection(callbackInit);
 
 function callbackInit () {
   name.databaseManagerMongo.findAllUsers().then((result) => {
     console.log(JSON.stringify(result, undefined, 2));
-    console.log("Done");
-    process.exit();
+    console.log("Done getting users");
+
+    const newTrackedUser = {
+      username: result[0],
+      expirationDate: new Date()
+    };
+
+    name.databaseManagerMongo.addToTrackedCollection(newTrackedUser);
+
+    setTimeout(() => {
+      process.exit();
+    }, 1500);
   });
 }
 

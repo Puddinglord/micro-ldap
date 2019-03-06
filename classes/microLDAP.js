@@ -19,7 +19,7 @@ class MicroLDAP {
     // Configuration Object
     this.configurationOptions = {
       existingMongoUsernameCollection: "Users",
-      newMongoRulesetCollection: "UsersExpirationAndRulesets",
+      newMongoRulesetCollection: "UserExpiration",
       defaultExpirationTime: 30, // Measured in days
       useDefaultRuleset: true,
       defaultServiceInterval: 86400000 // 24 hours in milliseconds
@@ -83,38 +83,6 @@ class MicroLDAP {
 
     // Now we need to pass on these configurations to their respective classes
     this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
-  }
-
-  /**
-   *
-   *
-   * @param {String} passwordToCheck The plain-text password to check. This is a passthrough function to PasswordManager
-   * which lets the real function be exposed to the user.
-   * @returns {Boolean} Returns true if the password meets or exceeds the ruleset, false if not.
-   * @memberof MicroLDAP
-   */
-  checkPassword (passwordToCheck) {
-    return this.passwordManager.checkPassword(passwordToCheck);
-  }
-
-  /**
-   * This is a passthrough function to the database manager that handles the mongoDB connection
-   * and operation.
-   *
-   * @param {String} mongoUrl The URL of the mongo database either external or locally hosted.
-   * @param {String} databaseName The name of the database to connect to.
-   * @param {String} collectionName The name of the collection where the users are stored.
-   * @param {String} usernameName The name of the field that relates to the usernames in the collection.
-   * @memberof MicroLDAP
-   */
-  setupDatabaseInformation (mongoUrl, databaseName, collectionName, usernameName) {
-    this.databaseManagerMongo.setupDatabaseInformation(mongoUrl, databaseName, collectionName, usernameName);
-  }
-
-  async findAllUsers () {
-    await this.databaseManagerMongo.findAllUsers().then((result) => {
-      this.usernameList = result;
-    });
   }
 }
 

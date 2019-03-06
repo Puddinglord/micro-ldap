@@ -12,25 +12,24 @@ class DatabaseManagerMongo {
     this.mongoUrl = null;
     this.databaseName = null;
     this.collectionName = null;
+    this.trackedCollectionName = "UserExpiration";
     this.usernameName = null;
     this.database = { databaseObject: null, db: null };
     this.isDbConnected = false;
   }
 
   initializeDatabaseConnection (callback) {
-    if (!this.isDbConnected) {
-      this.mongoClient.connect(this.mongoUrl, { useNewUrlParser: true }, (err, db) => {
-        if (err) {
-          console.error(err);
-        } else {
-          this.database.db = db;
-          this.database.databaseObject = db.db(this.databaseName);
-          this.isDbConnected = true;
-          console.log("connected");
-          callback();
-        }
-      });
-    }
+    this.mongoClient.connect(this.mongoUrl, { useNewUrlParser: true }, (err, db) => {
+      if (err) {
+        console.error(err);
+      } else {
+        this.database.db = db;
+        this.database.databaseObject = db.db(this.databaseName);
+        this.isDbConnected = true;
+        console.log("connected");
+        callback();
+      }
+    });
   }
 
   isDatabaseReadyForQuery () {
@@ -55,17 +54,40 @@ class DatabaseManagerMongo {
     // eslint-disable-next-line no-unused-vars
     const usernameName = this.usernameName;
 
-    if (this.isDatabaseReadyForQuery()) {
-      await this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
-        if (error) {
-          console.error(error);
-        }
+    await this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
+      if (error) {
+        console.error(error);
+        this.isDatabaseReadyForQuery();
+      }
 
-        usernameList.push(document.username);
-      });
+      usernameList.push(document.username);
+    });
 
-      return usernameList;
+    return usernameList;
+  }
+
+  /**
+   * This adds the specified JSON/Document to the tracked collection that this
+   * service manages. This only adds a single JSON/Document to the collection
+   *
+   * @param {JSON} documentToAdd The document should contain the following information
+   * - document.username - The username that was taken from the real Users collection.
+   * - document.expirationDate - The date when the users password will expire. This is calculated
+   * elsewhere.
+   * @memberof DatabaseManagerMongo
+   */
+  async addToTrackedCollection (documentToAdd) {
+    const newTrackedUser = {
+      username: documentToAdd.username,
+      expirationDate: documentToAdd.expirationDate
     };
+
+    await this.database.databaseObject.collection(this.trackedCollectionName).insertOne(newTrackedUser, (err) => {
+      if (err) {
+        console.error(err);
+        this.isDatabaseReadyForQuery();
+      }
+    });
   }
 
   /**
