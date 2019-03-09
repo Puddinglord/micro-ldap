@@ -2,15 +2,15 @@
 
 let name = require("../index");
 
-// let newConfigurationOptions = {
-//   existingMongoUsernameCollection: "Users",
-//   newMongoRulesetCollection: "UsersExpirationAndRulesets",
-//   defaultExpirationTime: 30,
-//   useDefaultRuleset: true,
-//   defaultServiceInterval: 86400000
-// };
+let newConfigurationOptions = {
+  existingMongoUsernameCollection: "Users",
+  newMongoRulesetCollection: "UsersExpirationAndRulesets",
+  defaultExpirationTime: 30,
+  useDefaultRuleset: true,
+  defaultServiceInterval: 86400000
+};
 
-// name.configureService();
+name.configureService(newConfigurationOptions);
 
 console.log(name.passwordManager.checkPassword("Aa5%"));
 

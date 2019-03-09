@@ -8,20 +8,7 @@
  */
 class PasswordManager {
   constructor () {
-    this.currentRuleset = null;
-    this.defaultRuleset = this.initializeDefaultRuleset();
-
-    this.useDefaultRuleset = true;
-  }
-
-  /**
-   * Initializes the default ruleset so we have some default values to work
-   * with in case the user just wants some basic password complexity
-   *
-   * @memberof PasswordManager
-   */
-  initializeDefaultRuleset () {
-    this.defaultRuleset = {
+    this.currentRuleset = {
       requireLowercase: true,
       numberOfLowercase: 1,
       requireUppercase: true,
@@ -34,8 +21,33 @@ class PasswordManager {
       maximumLength: 100
     };
 
-    this.currentRuleset = this.defaultRuleset;
+    console.log(this.currentRuleset.minimumLength);
+
+    this.useDefaultRuleset = true;
   }
+
+  /**
+   * Initializes the default ruleset so we have some default values to work
+   * with in case the user just wants some basic password complexity
+   *
+   * @memberof PasswordManager
+   */
+  // initializeDefaultRuleset () {
+  //   this.currentRuleset = {
+  //     requireLowercase: true,
+  //     numberOfLowercase: 1,
+  //     requireUppercase: true,
+  //     numberOfUppercase: 1,
+  //     requireNumber: true,
+  //     numberOfNumbers: 1,
+  //     requireSpecialCharacter: true,
+  //     numberOfSpecialCharacters: 1,
+  //     minimumLength: 8,
+  //     maximumLength: 100
+  //   };
+
+  //   //this.currentRuleset = this.defaultRuleset;
+  // }
 
   /**
    * Updates the current ruleset as long as the newRuleset is not a boolean.

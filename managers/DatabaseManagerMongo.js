@@ -16,6 +16,8 @@ class DatabaseManagerMongo {
     this.usernameName = null;
     this.database = { databaseObject: null, db: null };
     this.isDbConnected = false;
+
+    this.configurationOptions = null;
   }
 
   initializeDatabaseConnection (callback) {
@@ -77,9 +79,14 @@ class DatabaseManagerMongo {
    * @memberof DatabaseManagerMongo
    */
   async addToTrackedCollection (documentToAdd) {
+    const currentDate = new Date();
+    const expirationDateMillis = currentDate.setDate(currentDate.getDate() + this.configurationOptions.defaultExpirationTime);
+    const expirationDate = new Date(expirationDateMillis);
+
     const newTrackedUser = {
       username: documentToAdd.username,
-      expirationDate: documentToAdd.expirationDate
+      expirationDate: expirationDate,
+      ruleset: this.configurationOptions.defaultRuleset
     };
 
     await this.database.databaseObject.collection(this.trackedCollectionName).insertOne(newTrackedUser, (err) => {
@@ -120,6 +127,9 @@ class DatabaseManagerMongo {
 
   getUsernameName () { return this.usernameName; };
   setUsernameName (usernameName) { this.usernameName = usernameName; };
+
+  getConfigurationOptions () { return this.configurationOptions; };
+  setConfigurationOptions (configurationOptions) { this.configurationOptions = configurationOptions; };
 }
 
 module.exports = new DatabaseManagerMongo();

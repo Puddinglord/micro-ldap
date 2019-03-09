@@ -82,7 +82,8 @@ class MicroLDAP {
     this.configurationOptions.defaultServiceInterval = newConfigurationOptions.defaultServiceInterval;
 
     // Now we need to pass on these configurations to their respective classes
-    this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
+    // this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
+    this.databaseManagerMongo.setConfigurationOptions(this.configurationOptions);
   }
 }
 
