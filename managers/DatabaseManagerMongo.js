@@ -92,18 +92,6 @@ class DatabaseManagerMongo {
   }
 
   // Getters and Setters
-  getMongoUrl () { return this.mongoUrl; };
-  setMongoUrl (mongoUrl) { this.mongoUrl = mongoUrl; };
-
-  getDatabaseName () { return this.databaseName; };
-  setDatabaseName (databaseName) { this.databaseName = databaseName; };
-
-  getCollectionName () { return this.collectionName; };
-  setCollectionName (collectionName) { this.collectionName = collectionName; };
-
-  getUsernameName () { return this.usernameName; };
-  setUsernameName (usernameName) { this.usernameName = usernameName; };
-
   getConfigurationOptions () { return this.configurationOptions; };
   setConfigurationOptions (configurationOptions) { this.configurationOptions = configurationOptions; };
 }
