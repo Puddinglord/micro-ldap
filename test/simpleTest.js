@@ -23,10 +23,7 @@ function callbackInit () {
     console.log(JSON.stringify(result, undefined, 2));
     console.log("Done getting users");
 
-    const newTrackedUser = {
-      username: result[0],
-      expirationDate: new Date()
-    };
+    const newTrackedUser = result[0].username;
 
     name.databaseManagerMongo.addToTrackedCollection(newTrackedUser);
 

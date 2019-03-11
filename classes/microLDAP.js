@@ -84,7 +84,8 @@ class MicroLDAP {
         databaseName: "microLDAP",
         collectionName: "Users",
         usernameName: "username",
-        trackedCollectionName: "UserExpiration"
+        trackedCollectionName: "UserExpiration",
+        ruleSet: "default"
       }
     };
 

@@ -49,9 +49,9 @@ class DatabaseManagerMongo {
 
     // We are using the usernameName varaible to query the database but ESLint doesn't think so hence disabling the next line
     // eslint-disable-next-line no-unused-vars
-    const usernameName = this.usernameName;
+    const usernameName = this.configurationOptions.mongoDatabaseInformation.usernameName;
 
-    await this.database.databaseObject.collection(this.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
+    await this.database.databaseObject.collection(this.configurationOptions.mongoDatabaseInformation.collectionName).find({}, { usernameName: 1, _id: 0 }).forEach((document, error) => {
       if (error) {
         console.error(error);
         this.isDatabaseReadyForQuery();
@@ -64,27 +64,26 @@ class DatabaseManagerMongo {
   }
 
   /**
-   * This adds the specified JSON/Document to the tracked collection that this
-   * service manages. This only adds a single JSON/Document to the collection
+   * This adds the specified username to the tracked collection that this
+   * service manages. This only adds a single username to the collection
    *
-   * @param {JSON} documentToAdd The document should contain the following information
-   * - document.username - The username that was taken from the real Users collection.
-   * - document.expirationDate - The date when the users password will expire. This is calculated
-   * elsewhere.
+   * @param {String} userToAdd The username to be added to the tracked collection. It will follow the
+   * configuration options that have already been set such as the expiration date and the ruleset it should
+   * follow for passwords.
    * @memberof DatabaseManagerMongo
    */
-  async addToTrackedCollection (documentToAdd) {
+  async addToTrackedCollection (userToAdd) {
     const currentDate = new Date();
     const expirationDateMillis = currentDate.setDate(currentDate.getDate() + this.configurationOptions.defaultExpirationTime);
     const expirationDate = new Date(expirationDateMillis);
 
     const newTrackedUser = {
-      username: documentToAdd.username,
+      username: userToAdd,
       expirationDate: expirationDate,
-      ruleset: this.configurationOptions.defaultRuleset
+      ruleset: this.configurationOptions.mongoDatabaseInformation.ruleSet
     };
 
-    await this.database.databaseObject.collection(this.trackedCollectionName).insertOne(newTrackedUser, (err) => {
+    await this.database.databaseObject.collection(this.configurationOptions.mongoDatabaseInformation.trackedCollectionName).insertOne(newTrackedUser, (err) => {
       if (err) {
         console.error(err);
         this.isDatabaseReadyForQuery();
