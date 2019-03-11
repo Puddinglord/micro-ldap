@@ -68,13 +68,9 @@ class MicroLDAP {
       useDefaultRuleset: true,
       defaultServiceInterval: 86400000, // 24 hours in milliseconds
       passwordRules: {
-        requireLowercase: true,
         numberOfLowercase: 1,
-        requireUppercase: true,
         numberOfUppercase: 1,
-        requireNumber: true,
         numberOfNumbers: 1,
-        requireSpecialCharacter: true,
         numberOfSpecialCharacters: 1,
         minimumLength: 8,
         maximumLength: 100
