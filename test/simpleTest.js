@@ -2,19 +2,19 @@
 
 let name = require("../index");
 
-let newConfigurationOptions = {
-  existingMongoUsernameCollection: "Users",
-  newMongoRulesetCollection: "UsersExpirationAndRulesets",
-  defaultExpirationTime: 30,
-  useDefaultRuleset: true,
-  defaultServiceInterval: 86400000
-};
+// let newConfigurationOptions = {
+//   existingMongoUsernameCollection: "Users",
+//   newMongoRulesetCollection: "UsersExpirationAndRulesets",
+//   defaultExpirationTime: 30,
+//   useDefaultRuleset: true,
+//   defaultServiceInterval: 86400000
+// };
 
-name.configureService(newConfigurationOptions);
+// name.configureService(newConfigurationOptions);
 
 console.log(name.passwordManager.checkPassword("Aa5%"));
 
-name.databaseManagerMongo.setupDatabaseInformation("mongodb://localhost:27017/microLDAP", "microLDAP", "Users", "username");
+// name.databaseManagerMongo.setupDatabaseInformation("mongodb://localhost:27017/microLDAP", "microLDAP", "Users", "username");
 
 name.databaseManagerMongo.initializeDatabaseConnection(callbackInit);
 

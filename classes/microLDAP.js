@@ -12,24 +12,31 @@
  */
 class MicroLDAP {
   constructor () {
+    // Configuration Object
+    this.configurationOptions = this.initializeDefaultConfiguration();
+
     this.checkTypes = require("../helpers/CheckTypes");
     this.passwordManager = require("../managers/PasswordManager");
     this.databaseManagerMongo = require("../managers/DatabaseManagerMongo");
-
-    // Configuration Object
-    this.configurationOptions = {
-      existingMongoUsernameCollection: "Users",
-      newMongoRulesetCollection: "UserExpiration",
-      defaultExpirationTime: 30, // Measured in days
-      useDefaultRuleset: true,
-      defaultServiceInterval: 86400000 // 24 hours in milliseconds
-    };
 
     // Timer based variables
     this.timerReference = null;
 
     // List of usernames
     this.usernameList = [];
+
+    this.start();
+  }
+
+  /**
+   * Pass along all the needed information to all subclasses so they
+   * all have the correct and default configuration options
+   *
+   * @memberof MicroLDAP
+   */
+  start () {
+    this.passwordManager.setConfigurationOptions(this.configurationOptions);
+    this.databaseManagerMongo.setConfigurationOptions(this.configurationOptions);
   }
 
   /**
@@ -51,6 +58,37 @@ class MicroLDAP {
    */
   stopService () {
     clearInterval(this.timerReference);
+  }
+
+  initializeDefaultConfiguration () {
+    const configurationOptions = {
+      existingMongoUsernameCollection: "Users",
+      newMongoRulesetCollection: "UserExpiration",
+      defaultExpirationTime: 30, // Measured in days
+      useDefaultRuleset: true,
+      defaultServiceInterval: 86400000, // 24 hours in milliseconds
+      passwordRules: {
+        requireLowercase: true,
+        numberOfLowercase: 1,
+        requireUppercase: true,
+        numberOfUppercase: 1,
+        requireNumber: true,
+        numberOfNumbers: 1,
+        requireSpecialCharacter: true,
+        numberOfSpecialCharacters: 1,
+        minimumLength: 8,
+        maximumLength: 100
+      },
+      mongoDatabaseInformation: {
+        mongoUrl: "mongodb://localhost:27017/microLDAP",
+        databaseName: "microLDAP",
+        collectionName: "Users",
+        usernameName: "username",
+        trackedCollectionName: "UserExpiration"
+      }
+    };
+
+    return configurationOptions;
   }
 
   /**
