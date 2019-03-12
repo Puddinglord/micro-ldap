@@ -8,70 +8,7 @@
  */
 class PasswordManager {
   constructor () {
-    this.defaultRuleset = this.initializeDefaultRuleset();
-    this.currentRuleset = this.initializeCurrentRuleset();
-
-    this.useDefaultRuleset = true;
-  }
-
-  /**
-   * Initializes the default ruleset so we have some default values to work
-   * with in case the user just wants some basic password complexity
-   *
-   * @memberof PasswordManager
-   */
-  initializeDefaultRuleset () {
-    this.defaultRuleset = {
-      requireLowercase: true,
-      numberOfLowercase: 1,
-      requireUppercase: true,
-      numberOfUppercase: 1,
-      requireNumber: true,
-      numberOfNumbers: 1,
-      requireSpecialCharacter: true,
-      numberOfSpecialCharacters: 1,
-      minimumLength: 8,
-      maximumLength: 100
-    };
-  }
-
-  /**
-   * Initializes the current ruleset so we have an object to work with
-   *
-   * @memberof PasswordManager
-   */
-  initializeCurrentRuleset () {
-    this.currentRuleset = {
-      requireLowercase: null,
-      numberOfLowercase: null,
-      requireUppercase: null,
-      numberOfUppercase: null,
-      requireNumber: null,
-      numberOfNumbers: null,
-      requireSpecialCharacter: null,
-      numberOfSpecialCharacters: null,
-      minimumLength: null,
-      maximumLength: null
-    };
-  }
-
-  /**
-   * Updates the current ruleset as long as the newRuleset is not a boolean.
-   * If it's a boolean then we know the user wants to use the default ruleset.
-   * If not then we accept a ruleset object and update our current ruleset object
-   *
-   * @param {Boolean | Object} newRuleset If it's a boolean then we know the user wants to use the default
-   * ruleset. If not then it must be an object which we will take as our new current ruleset.
-   * @memberof PasswordManager
-   */
-  updateRuleset (newRuleset) {
-    if (newRuleset) {
-      this.useDefaultRuleset = true;
-      this.currentRuleset = this.defaultRuleset;
-    } else {
-      this.useDefaultRuleset = false;
-      this.currentRuleset = newRuleset;
-    }
+    this.configurationOptions = null;
   }
 
   /**
@@ -87,12 +24,12 @@ class PasswordManager {
     let returnValue = true;
 
     // Check to see if the password minimum and maximum length are ok or not
-    if (passwordToCheck.length <= this.currentRuleset.minimumLength || passwordToCheck.length >= this.currentRuleset.maximumLength) {
+    if (passwordToCheck.length <= this.configurationOptions.passwordRules.minimumLength || passwordToCheck.length >= this.configurationOptions.passwordRules.maximumLength) {
       returnValue = false;
     }
 
     // Check to see if the password has the required number of lowercase characters
-    if (this.currentRuleset.requireLowercase) {
+    if (this.configurationOptions.passwordRules.requireLowercase) {
       const regexTest = /(.*[a-z]){1}/g;
 
       if (!regexTest.test(passwordToCheck)) {
@@ -101,7 +38,7 @@ class PasswordManager {
     }
 
     // Check to see if the password has the required number of uppercase characters
-    if (this.currentRuleset.requireUppercase) {
+    if (this.configurationOptions.passwordRules.requireUppercase) {
       const regexTest = /(.*[A-Z]){1}/g;
 
       if (!regexTest.test(passwordToCheck)) {
@@ -110,7 +47,7 @@ class PasswordManager {
     }
 
     // Check to see if the password has the required number of lowercase characters
-    if (this.currentRuleset.requireNumber) {
+    if (this.configurationOptions.passwordRules.requireNumber) {
       const regexTest = /(.*[0-9]){1}/g;
 
       if (!regexTest.test(passwordToCheck)) {
@@ -119,7 +56,7 @@ class PasswordManager {
     }
 
     // Check to see if the password has the required number of lowercase characters
-    if (this.currentRuleset.requireSpecialCharacter) {
+    if (this.configurationOptions.passwordRules.requireSpecialCharacter) {
       const regexTest = /(.*[#$@!%&*?]){1}/g;
 
       if (!regexTest.test(passwordToCheck)) {
@@ -129,6 +66,10 @@ class PasswordManager {
 
     return returnValue;
   }
+
+  // Getters and Setters
+  getConfigurationOptions () { return this.configurationOptions; };
+  setConfigurationOptions (configurationOptions) { this.configurationOptions = configurationOptions; };
 }
 
 module.exports = new PasswordManager();

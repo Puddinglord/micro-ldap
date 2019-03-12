@@ -5,34 +5,46 @@
  * the service as well as a way to ocrcestrate other functionality and features that can extend and enhance the base
  * feature set.
  *
+ * This class also provides passthrough functions that are used to extend functionallity
+ * while keeping the code base clean and tidy.
+ *
  * @class MicroLDAP
  */
 class MicroLDAP {
   constructor () {
+    // Configuration Object
+    this.configurationOptions = this.initializeDefaultConfiguration();
+
     this.checkTypes = require("../helpers/CheckTypes");
     this.passwordManager = require("../managers/PasswordManager");
-
-    this.configurationOptions = {
-      existingMongoUsernameCollection: null,
-      newMongoRulesetCollection: "UsersExpirationAndRulesets",
-      defaultExpirationTime: 30, // Measured in days
-      useDefaultRuleset: true,
-      defaultServiceInterval: 86400000 // 24 hours in milliseconds
-    };
-
-    // Configuration variables
-    this.existingMongoUsernameCollection = null;
-    this.newMongoRulesetCollection = null;
-    this.defaultExpirationTime = null;
-    this.useDefaultRuleset = null;
-    this.defaultServiceInterval = null;
+    this.databaseManagerMongo = require("../managers/DatabaseManagerMongo");
 
     // Timer based variables
     this.timerReference = null;
+
+    // List of usernames
+    this.usernameList = [];
+
+    this.start();
+  }
+
+  /**
+   * Pass along all the needed information to all subclasses so they
+   * all have the correct and default configuration options
+   *
+   * @memberof MicroLDAP
+   */
+  start () {
+    this.passwordManager.setConfigurationOptions(this.configurationOptions);
+    this.databaseManagerMongo.setConfigurationOptions(this.configurationOptions);
   }
 
   /**
    * Starts the Micro LDAP service
+   *
+   * Every time the timer has completed an interval
+   * (Set by the defaultServiceInterval value in the configuration options)
+   * we check to see if a user's password has expired or not.
    *
    * @memberof MicroLDAP
    */
@@ -40,16 +52,51 @@ class MicroLDAP {
     // Start the service
     this.timerReference = setInterval(() => {
       // Check to see if a password has expired
+      this.databaseManagerMongo.crawlTrackedCollection();
     }, this.defaultServiceInterval);
   }
 
   /**
-   * Stop the service
+   * Stops the service
    *
    * @memberof MicroLDAP
    */
   stopService () {
     clearInterval(this.timerReference);
+  }
+
+  /**
+   * Initializes the default configuration object.
+   *
+   * @returns configurationOptions (The configuration object).
+   * @memberof MicroLDAP
+   */
+  initializeDefaultConfiguration () {
+    const configurationOptions = {
+      existingMongoUsernameCollection: "Users",
+      newMongoRulesetCollection: "UserExpiration",
+      defaultExpirationTime: 30, // Measured in days
+      useDefaultRuleset: true,
+      defaultServiceInterval: 86400000, // 24 hours in milliseconds
+      passwordRules: {
+        numberOfLowercase: 1,
+        numberOfUppercase: 1,
+        numberOfNumbers: 1,
+        numberOfSpecialCharacters: 1,
+        minimumLength: 8,
+        maximumLength: 100
+      },
+      mongoDatabaseInformation: {
+        mongoUrl: "mongodb://localhost:27017/microLDAP",
+        databaseName: "microLDAP",
+        collectionName: "Users",
+        usernameName: "username",
+        trackedCollectionName: "UserExpiration",
+        ruleSet: "default"
+      }
+    };
+
+    return configurationOptions;
   }
 
   /**
@@ -81,19 +128,8 @@ class MicroLDAP {
     this.configurationOptions.defaultServiceInterval = newConfigurationOptions.defaultServiceInterval;
 
     // Now we need to pass on these configurations to their respective classes
-    this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
-  }
-
-  /**
-   *
-   *
-   * @param {String} passwordToCheck The plain-text password to check. This is a passthrough function to PasswordManager
-   * which lets the real function be exposed to the user.
-   * @returns Boolean
-   * @memberof MicroLDAP
-   */
-  checkPassword (passwordToCheck) {
-    return this.passwordManager.checkPassword(passwordToCheck);
+    // this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
+    this.databaseManagerMongo.setConfigurationOptions(this.configurationOptions);
   }
 }
 
