@@ -67,6 +67,7 @@ class PasswordManager {
     return returnValue;
   }
 
+  // Getters and Setters
   getConfigurationOptions () { return this.configurationOptions; };
   setConfigurationOptions (configurationOptions) { this.configurationOptions = configurationOptions; };
 }

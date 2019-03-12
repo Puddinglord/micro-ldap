@@ -23,13 +23,17 @@ function callbackInit () {
     console.log(JSON.stringify(result, undefined, 2));
     console.log("Done getting users");
 
-    const newTrackedUser = result[0].username;
+    const newTrackedUser = result[0];
+
+    console.log(newTrackedUser);
 
     name.databaseManagerMongo.addToTrackedCollection(newTrackedUser);
 
-    setTimeout(() => {
-      process.exit();
-    }, 1500);
+    name.databaseManagerMongo.crawlTrackedCollection().then(() => {
+      setTimeout(() => {
+        process.exit();
+      }, 1000);
+    });
   });
 }
 

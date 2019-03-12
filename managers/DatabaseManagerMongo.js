@@ -15,6 +15,13 @@ class DatabaseManagerMongo {
     this.configurationOptions = null;
   }
 
+  /**
+   * Initializes the database connection. Also provides a callback so the caller can tell
+   * when the database has connected as it is not instantaneous.
+   *
+   * @param {Function} callback
+   * @memberof DatabaseManagerMongo
+   */
   initializeDatabaseConnection (callback) {
     this.mongoClient.connect(this.configurationOptions.mongoDatabaseInformation.mongoUrl, { useNewUrlParser: true }, (err, db) => {
       if (err) {
@@ -23,12 +30,20 @@ class DatabaseManagerMongo {
         this.database.db = db;
         this.database.databaseObject = db.db(this.databaseName);
         this.isDbConnected = true;
-        console.log("connected");
         callback();
       }
     });
   }
 
+  /**
+   * Checks to see if the database is connected or not.
+   * If we are connected then we just return with a true value
+   * (since the database hasn't disconnected it will be true).
+   * If the database isn't connected then we reconnect it.
+   *
+   * @returns isDbConnected (Boolean)
+   * @memberof DatabaseManagerMongo
+   */
   isDatabaseReadyForQuery () {
     if (!this.isDbConnected) {
       this.initializeDatabaseConnection();
@@ -80,6 +95,7 @@ class DatabaseManagerMongo {
     const newTrackedUser = {
       username: userToAdd,
       expirationDate: expirationDate,
+      expired: false,
       ruleset: this.configurationOptions.mongoDatabaseInformation.ruleSet
     };
 
@@ -87,6 +103,64 @@ class DatabaseManagerMongo {
       if (err) {
         console.error(err);
         this.isDatabaseReadyForQuery();
+      }
+    });
+  }
+
+  /**
+   * Crawls the tracked collection and for every username we find we check to see if the
+   * user has an expired password or not.
+   *
+   * @memberof DatabaseManagerMongo
+   */
+  async crawlTrackedCollection () {
+    // We are using the usernameName varaible to query the database but ESLint doesn't think so hence disabling the next line
+    // eslint-disable-next-line no-unused-vars
+    const usernameName = this.configurationOptions.mongoDatabaseInformation.usernameName;
+
+    await this.database.databaseObject.collection(this.configurationOptions.mongoDatabaseInformation.trackedCollectionName).find({}).forEach((document, error) => {
+      if (error) {
+        console.error(error);
+        this.isDatabaseReadyForQuery();
+      }
+
+      this.checkIfExpired(document);
+    });
+  }
+
+  /**
+   * Checks to see if the current date is less than the documents expiration date.
+   * If so then everything is good and we don't need to do anything. If not then
+   * we need to mark the user as expired.
+   *
+   * @param {JSON} document
+   * @memberof DatabaseManagerMongo
+   */
+  checkIfExpired (document) {
+    const currentDate = new Date();
+
+    if (currentDate.getTime() < document.expirationDate.getTime()) {
+      // The password has not yet expired so we are good
+    } else {
+      // The password has expired so we need to mark the user as expired (password wise)
+      this.markUserAsExpired(document.username);
+    }
+  }
+
+  /**
+   * Updates one document in the tracked collection to be expired by setting the expired
+   * element to true.
+   *
+   * @param {String} username
+   * @memberof DatabaseManagerMongo
+   */
+  async markUserAsExpired (username) {
+    const query = { username: username };
+    const valueToUpdate = { $set: { expired: true } };
+
+    await this.database.databaseObject.collection(this.configurationOptions.mongoDatabaseInformation.trackedCollectionName).updateOne(query, valueToUpdate, (error) => {
+      if (error) {
+        console.error(error);
       }
     });
   }

@@ -42,12 +42,17 @@ class MicroLDAP {
   /**
    * Starts the Micro LDAP service
    *
+   * Every time the timer has completed an interval
+   * (Set by the defaultServiceInterval value in the configuration options)
+   * we check to see if a user's password has expired or not.
+   *
    * @memberof MicroLDAP
    */
   startService () {
     // Start the service
     this.timerReference = setInterval(() => {
       // Check to see if a password has expired
+      this.databaseManagerMongo.crawlTrackedCollection();
     }, this.defaultServiceInterval);
   }
 
@@ -60,6 +65,12 @@ class MicroLDAP {
     clearInterval(this.timerReference);
   }
 
+  /**
+   * Initializes the default configuration object.
+   *
+   * @returns configurationOptions (The configuration object).
+   * @memberof MicroLDAP
+   */
   initializeDefaultConfiguration () {
     const configurationOptions = {
       existingMongoUsernameCollection: "Users",
