@@ -1,6 +1,6 @@
 {
     "name": "micro-ldap",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "description": "A replacement for user and password management without the overhead of a full LDAP.",
     "license": "MIT",
     "repository": "Puddinglord/micro-ldap",
@@ -8,8 +8,8 @@
     "keywords": [
         "micro-ldap",
         "micro ldap",
-        "microldap", 
-        "micro",
+        "microldap",
+        "microLDAP",
         "LDAP",
         "ldap",
         "npm",

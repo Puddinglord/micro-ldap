@@ -89,7 +89,7 @@ class DatabaseManagerMongo {
    */
   async addToTrackedCollection (userToAdd) {
     const currentDate = new Date();
-    const expirationDateMillis = currentDate.setDate(currentDate.getDate() + this.configurationOptions.defaultExpirationTime);
+    const expirationDateMillis = currentDate.setDate(currentDate.getDate() + this.configurationOptions.expirationTime);
     const expirationDate = new Date(expirationDateMillis);
 
     const newTrackedUser = {

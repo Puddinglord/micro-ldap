@@ -43,7 +43,7 @@ class MicroLDAP {
    * Starts the Micro LDAP service
    *
    * Every time the timer has completed an interval
-   * (Set by the defaultServiceInterval value in the configuration options)
+   * (Set by the serviceInterval value in the configuration options)
    * we check to see if a user's password has expired or not.
    *
    * @memberof MicroLDAP
@@ -53,7 +53,7 @@ class MicroLDAP {
     this.timerReference = setInterval(() => {
       // Check to see if a password has expired
       this.databaseManagerMongo.crawlTrackedCollection();
-    }, this.defaultServiceInterval);
+    }, this.configurationOptions.serviceInterval);
   }
 
   /**
@@ -74,10 +74,8 @@ class MicroLDAP {
   initializeDefaultConfiguration () {
     const configurationOptions = {
       existingMongoUsernameCollection: "Users",
-      newMongoRulesetCollection: "UserExpiration",
-      defaultExpirationTime: 30, // Measured in days
-      useDefaultRuleset: true,
-      defaultServiceInterval: 86400000, // 24 hours in milliseconds
+      expirationTime: 30, // Measured in days
+      serviceInterval: 86400000, // 24 hours in milliseconds
       passwordRules: {
         numberOfLowercase: 1,
         numberOfUppercase: 1,
@@ -106,30 +104,29 @@ class MicroLDAP {
    *
    * @param {Object} newConfigurationOptions This object takes the following parameters:
    * - existingMongoUsernameCollection which is a String that represents the current Users collection name in the users database
-   * - newMongoRulesetCollection which is a String that represents the new collections name where the users expiration and ruleset will be stored
-   * - defaultExpirationTime which is a Number that represents the default expiration time for which a client will have to change their password
+   * - newMongoTrackedCollection which is a String that represents the new collections name where the users expiration and ruleset will be stored
+   * - expirationTime which is a Number that represents the default expiration time for which a client will have to change their password
    * - useDefaultRuleset which is a Boolean which lets us know if the user wants to use the default ruleset or define their own
-   * - defaultServiceInterval which is a Number that represents the default interval the service runs at and checks the collection to see if anyone has expired
+   * - serviceInterval which is a Number that represents the default interval the service runs at and checks the collection to see if anyone has expired
    * @memberof MicroLDAP
    */
   configureService (newConfigurationOptions) {
     // Check to make sure the parameters passed in are of the correct type
     // If they are not of the correct type then the checkTypes function will throw an error
-    this.checkTypes(newConfigurationOptions.existingMongoUsernameCollection, String);
-    this.checkTypes(newConfigurationOptions.newMongoRulesetCollection, String);
-    this.checkTypes(newConfigurationOptions.defaultExpirationTime, Number);
-    this.checkTypes(newConfigurationOptions.useDefaultRuleset, Boolean);
-    this.checkTypes(newConfigurationOptions.defaultServiceInterval, Number);
+    this.checkConfigurationValues(newConfigurationOptions);
 
-    this.configurationOptions.existingMongoUsernameCollection = newConfigurationOptions.existingMongoUsernameCollection;
-    this.configurationOptions.newMongoRulesetCollection = newConfigurationOptions.newMongoRulesetCollection;
-    this.configurationOptions.defaultExpirationTime = newConfigurationOptions.defaultExpirationTime;
-    this.configurationOptions.useDefaultRuleset = newConfigurationOptions.useDefaultRuleset;
-    this.configurationOptions.defaultServiceInterval = newConfigurationOptions.defaultServiceInterval;
+    this.configurationOptions = newConfigurationOptions;
 
     // Now we need to pass on these configurations to their respective classes
-    // this.passwordManager.updateRuleset(this.configurationOptions.useDefaultRuleset);
+    this.passwordManager.setConfigurationOptions(this.configurationOptions);
     this.databaseManagerMongo.setConfigurationOptions(this.configurationOptions);
+  }
+
+  checkConfigurationValues (newConfigurationOptions) {
+    this.checkTypes(newConfigurationOptions.existingMongoUsernameCollection, String);
+    this.checkTypes(newConfigurationOptions.expirationTime, Number);
+    this.checkTypes(newConfigurationOptions.useDefaultRuleset, Boolean);
+    this.checkTypes(newConfigurationOptions.serviceInterval, Number);
   }
 }
 
