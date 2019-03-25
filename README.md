@@ -114,9 +114,17 @@ Let's break down these values!
 - `mongoDatabaseInformation.ruleSet`
   - A boolean value that tells the service if you are using the default password ruleset or are using a custom one. If you change anything in the password rules please update this to the value of `"custom"`.
 
+After all that configuration is done we can actually start the service. Please refer to the section below on how to start the service. Right now though we will go into how the service will let you know when someone has an expired password.
+
+Currently the tracked collection will have a field called "expired". When a user is first added to the tracked collection that field is set to false. Once then service runs for the first time, if it see's anyone is past their expiration date then it will mark that field as "true".
+
+Right now it's up to the developer (*cough cough* meaning you) to read this field when a user tries to login. If the field is true then you can give them a change password prompt or whatever you want really.
+
 ## Starting the Service
 
 As noted in the configuration options there is a value called `serviceInterval`. When you have configured the service to your liking and are ready to have it do all the dirty work just call `microLDAP.start()`. This will start the service as an interval which has a timeout value that was set in the configuration options. By default the service will run itself every 24 hours.
+
+***Note***: **Please make sure you set at least the database values in the configuration options. I highly doubt we both use the same values for everything.**
 
 ## Important Notes
 
